@@ -26,9 +26,9 @@ class State(BaseModel, Base):
     else:
         @property
         def cities(self):
-            """Gets a list of cities associated with this state
+            """Get a list of cities associated with this state
             Return:
-                returns a list of all City instances with a state_id matching
+                return a list of all City instances with a state_id matching
                 the id of the current State
             """
             objects = models.storage.all(models.city.City)
