@@ -1,60 +1,60 @@
 #!/usr/bin/python3
 """
-Script generates a .tgz archive from web_static folder
+Archive and deploy the contents of web_static
 """
-from fabric.operations import local, run, put, env
-from datetime import datetime
-import os
 
+from os.path import basename, isfile, join, sep, splitext
+from shlex import quote
+from time import strftime
+from fabric.api import env, local, put, run
 
 env.hosts = ['54.196.36.204', '54.237.90.27']
-env.user = 'ubuntu'
 
 
 def do_pack():
     """
-    function creates a .tgz archive
+    Archive the contents of web_static
     """
-
-    name = "./versions/web_static_{}.tgz"
-    name = name.format(datetime.now().strftime("%Y%m%d%H%M%S"))
-    local("mkdir -p versions")
-    create = local("tar -cvzf {} web_static".format(name))
-    if create.succeeded:
-        return name
-    else:
-        return None
+    now = strftime('%Y%m%d%H%M%S')
+    tgz = join('versions', 'web_static_{}.tgz'.format(now))
+    local('mkdir -p versions')
+    local('tar -czf {} web_static'.format(quote(tgz)))
+    return tgz if isfile(tgz) else None
 
 
 def do_deploy(archive_path):
     """
-    function to dist to web server
+    Deploy an archive to my Holberton web servers
     """
-
-    if not os.path.exists(archive_path):
-        return False
-    if not put(archive_path, "/tmp/").succeeded:
-        return False
-    print("Hello")
-    filename = archive_path[9:]
-    foldername = "/data/web_static/releases/" + filename[:-4]
-    filename = "/tmp/" + filename
-    if not run('mkdir -p {}'.format(foldername)).succeeded:
-        return False
-    if not run('tar -xzf {} -C {}'.format(filename, foldername)).succeeded:
-        return False
-    if not run('rm {}'.format(filename)).succeeded:
-        return False
-    if not run('mv {}/web_static/* {}'.format(foldername,
-                                              foldername)).succeeded:
-        return False
-    if not run('rm -rf {}/web_static'.format(foldername)).succeeded:
-        return False
-    if not run('rm -rf /data/web_static/current').succeeded:
-        return False
-    return run('ln -s {} /data/web_static/current'.format(
-        foldername)).succeeded
-
-
-if __name__ == "__main__":
-    do_pack()
+    if isfile(archive_path):
+        source_name = basename(archive_path)
+        source_path = join(sep, 'tmp', source_name)
+        dest_name = splitext(source_name)[0]
+        dest_path = join(sep, 'data', 'web_static', 'releases', dest_name)
+        put(archive_path, source_path)
+        run('mkdir -p {}'.format(
+            quote(dest_path)
+        ))
+        run('tar -xzf {} -C {}'.format(
+            quote(source_path),
+            quote(dest_path)
+        ))
+        run('rm -f {}'.format(
+            quote(source_path)
+        ))
+        run('mv {} {}'.format(
+            join(quote(join(dest_path, 'web_static')), '*'),
+            quote(join(dest_path, ''))
+        ))
+        run('rm -rf {}'.format(
+            quote(join(dest_path, 'web_static'))
+        ))
+        run('rm -rf {}'.format(
+            quote(join(sep, 'data', 'web_static', 'current'))
+        ))
+        run('ln -s {} {}'.format(
+            quote(dest_path),
+            quote(join(sep, 'data', 'web_static', 'current'))
+        ))
+        return True
+    return False
