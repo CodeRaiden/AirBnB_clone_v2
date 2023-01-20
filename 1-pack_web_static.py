@@ -1,24 +1,20 @@
 #!/usr/bin/python3
 """
-    Script generates a .tgz archive from web_static folder
+Create a tarball containing the contents of web_static
 """
+
+from os.path import isfile, join
+from shlex import quote
+from time import strftime
+from fabric.api import local
 
 
 def do_pack():
     """
-    function creates a .tgz
+    Archive the contents of web_static
     """
-    from fabric.operations import local
-    from datetime import datetime
-
-    name = "./versions/web_static_{}.tgz"
-    name = name.format(datetime.now().strftime("%Y%m%d%H%M%S"))
-    local("mkdir -p versions")
-    create = local("tar -cvzf {} web_static".format(name))
-    if create.succeeded:
-        return name
-    else:
-        return None
-
-if __name__ == "__main__":
-    do_pack()
+    now = strftime('%Y%m%d%H%M%S')
+    tgz = join('versions', 'web_static_{}.tgz'.format(now))
+    local('mkdir -p versions')
+    local('tar -czf {} web_static'.format(quote(tgz)))
+    return tgz if isfile(tgz) else None

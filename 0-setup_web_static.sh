@@ -14,7 +14,7 @@ cat > /data/web_static/releases/test/index.html << 'EOF'
   <head>
   </head>
   <body>
-    Holberton School
+    Hello World
   </body>
 </html>
 EOF
@@ -23,6 +23,6 @@ ln -fns /data/web_static/releases/test /data/web_static/current
 
 chown -hR ubuntu:ubuntu /data
 
-sed -i '/^\tlisten 80 default_server;$/i location /hbnb_static/ { alias /data/web_static/current/; }' /etc/nginx/sites-enabled/default
+sed -i '/^\tlisten 80 default_server;$/i location /hbnb_static/ { alias /data/web_static/current/; }' /etc/nginx/sites-available/default
 
 service nginx restart
