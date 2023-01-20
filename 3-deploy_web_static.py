@@ -8,7 +8,7 @@ from shlex import quote
 from time import strftime
 from fabric.api import env, local, put, run
 
-env.hosts = ['35.196.167.155', '34.73.252.236']
+env.hosts = ['54.196.36.204', '54.237.90.27']
 
 
 def do_pack():
@@ -24,7 +24,7 @@ def do_pack():
 
 def do_deploy(archive_path):
     """
-    Deploy an archive to my Holberton web servers
+    Deploy an archive to Holberton web servers
     """
     if isfile(archive_path):
         source_name = basename(archive_path)
@@ -62,7 +62,7 @@ def do_deploy(archive_path):
 
 def deploy():
     """
-    Archive the contents of web_static and deploy it to my web servers
+    Archive the contents of web_static and deploy it to web servers
     """
     try:
         return do_deploy(do_pack())
