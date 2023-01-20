@@ -1,17 +1,19 @@
 #!/usr/bin/python3
-"""DBStorage class that sets up SQLAlchemy and connects with database"""
+"""This is a DBStorage class for AirBnB"""
 import os
-from sqlalchemy import (create_engine)
-from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
-from models.user import User
-from models.state import State
-from models.city import City
+
+from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+from models.base_model import Base, BaseModel
 from models.amenity import Amenity
+from models.city import City
 from models.place import Place
 from models.review import Review
-from models import classes
-import models
+from models.state import State
+from models.user import User
+
 
 class DBStorage:
     """MySQL database storage engine
