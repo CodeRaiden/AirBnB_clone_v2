@@ -1,36 +1,37 @@
 #!/usr/bin/python3
-"""This is the state class"""
-import os
+'''
+    Implementation of the State class
+'''
 
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-
+from models.city import City
+import os
 import models
-from models.base_model import Base, BaseModel
 
 
 class State(BaseModel, Base):
-    """This is the class for State
-    Attributes:
-        name: input name
-        cities: relationship to cities table
-    """
-    __tablename__ = "states"
-
-    name = Column(String(128), nullable=False)
-
+    '''
+        Implementation for the State.
+    '''
+    __tablename__ = 'states'
     if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-        cities = relationship(
-            'City', backref='state', cascade='all, delete-orphan'
-        )
+        name = Column(String(128), nullable=False)
+        cities = relationship("City", passive_deletes=True, backref="state")
     else:
+        name = ""
+
         @property
         def cities(self):
-            """Get a list of cities associated with this state
-            Return:
-                return a list of all City instances with a state_id matching
-                the id of the current State
             """
-            objects = models.storage.all(models.city.City)
-            return [city for city in objects.values()
-                    if city.state_id == self.id]
+            cities property
+            """
+            city_list = []
+            for key, val in models.storage.all().items():
+                try:
+                    if val.state_id == self.id:
+                        city_list.append(val)
+                except AttributeError:
+                    pass
+            return city_list
